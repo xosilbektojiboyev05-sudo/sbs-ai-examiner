@@ -1,0 +1,710 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <meta
+      name="description"
+      content="SBS AI Examiner - AI-powered IELTS Writing and Speaking practice with instant band scores, detailed feedback, and performance analysis."
+    />
+
+    <meta
+      name="keywords"
+      content="SBS AI Examiner, IELTS AI Examiner, IELTS Writing, IELTS Speaking, IELTS practice, IELTS band score, IELTS preparation"
+    />
+
+    <meta name="author" content="SBS IELTS" />
+
+    <meta name="robots" content="index, follow" />
+
+    <title>SBS AI Examiner | IELTS Writing & Speaking AI</title>
+
+    <!-- SBS IELTS Favicon -->
+    <link rel="icon" type="image/png" href="/image.png" />
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Main CSS -->
+    <link rel="stylesheet" href="/style.css" />
+
+    <!-- Theme initialization -->
+    <script>
+      (function () {
+        try {
+          const savedTheme = localStorage.getItem("ielts-theme");
+
+          if (savedTheme === "dark") {
+            document.documentElement.dataset.theme = "dark";
+          } else {
+            document.documentElement.dataset.theme = "light";
+          }
+        } catch (error) {
+          document.documentElement.dataset.theme = "light";
+        }
+      })();
+    </script>
+  </head>
+
+  <body>
+    <!-- =====================================================
+     HEADER
+===================================================== -->
+
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark">
+          <img src="/image.png" alt="SBS IELTS" />
+        </div>
+        <div>
+          <h1>IELTS AI Examiner</h1>
+          <p>Practice smarter. Improve faster.</p>
+        </div>
+      </div>
+
+      <div class="top-actions">
+        <button
+          type="button"
+          class="theme-btn"
+          id="theme"
+          aria-label="Toggle dark mode"
+        >
+          <span id="theme-icon">☀</span>
+          <span id="theme-text">Light</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- =====================================================
+     MODE NAVIGATION
+===================================================== -->
+
+    <nav class="mode-nav">
+      <button
+        type="button"
+        class="mode-tab active"
+        id="writing-tab"
+        data-mode="writing"
+      >
+        <span>✍</span>
+        <span>Writing</span>
+      </button>
+
+      <button
+        type="button"
+        class="mode-tab"
+        id="speaking-tab"
+        data-mode="speaking"
+      >
+        <span>🎙</span>
+        <span>Speaking</span>
+      </button>
+    </nav>
+
+    <!-- =====================================================
+     MAIN
+===================================================== -->
+
+    <main class="app-container">
+      <!-- =====================================================
+     WRITING MODE
+===================================================== -->
+
+      <section class="mode-panel active" id="writing-mode">
+        <div class="section-heading">
+          <div>
+            <span class="eyebrow">IELTS Academic</span>
+
+            <h2>Writing Practice</h2>
+
+            <p>
+              Upload your question, write your answer, then receive an AI-style
+              IELTS assessment.
+            </p>
+          </div>
+
+          <div class="task-selector">
+            <button
+              type="button"
+              class="task-btn active"
+              data-task="1"
+              id="task1-btn"
+            >
+              Task 1
+            </button>
+
+            <button type="button" class="task-btn" data-task="2" id="task2-btn">
+              Task 2
+            </button>
+          </div>
+        </div>
+
+        <!-- WRITING GRID -->
+
+        <div class="writing-grid">
+          <!-- QUESTION CARD -->
+
+          <section class="card question-card">
+            <div class="card-header">
+              <div>
+                <span class="card-kicker"> QUESTION </span>
+
+                <h3>Writing question</h3>
+              </div>
+
+              <span class="task-badge" id="task-badge"> Task 1 </span>
+            </div>
+
+            <div class="question-tools">
+              <button type="button" class="tool-btn" id="question-gallery">
+                🖼 Gallery
+              </button>
+
+              <button type="button" class="tool-btn" id="question-camera">
+                📷 Camera
+              </button>
+
+              <button type="button" class="tool-btn" id="question-paste">
+                📋 Paste
+              </button>
+            </div>
+
+            <input type="file" id="question-file" accept="image/*" hidden />
+
+            <div class="image-preview" id="question-preview">
+              <div class="empty-preview">
+                <span>📊</span>
+
+                <p>
+                  Add a chart, graph, table, process or IELTS question image.
+                </p>
+              </div>
+            </div>
+
+            <textarea
+              id="question"
+              class="question-textarea"
+              placeholder="Or paste/type the IELTS question here..."
+              spellcheck="true"
+            ></textarea>
+          </section>
+
+          <!-- ANSWER CARD -->
+
+          <section class="card answer-card">
+            <div class="card-header">
+              <div>
+                <span class="card-kicker"> YOUR ANSWER </span>
+
+                <h3>Write your response</h3>
+              </div>
+
+              <div class="word-counter">
+                <strong id="words">0</strong>
+                <span>words</span>
+              </div>
+            </div>
+
+            <div class="answer-tools">
+              <button type="button" class="tool-btn" id="answer-gallery">
+                🖼 Gallery
+              </button>
+
+              <button type="button" class="tool-btn" id="answer-camera">
+                📷 Camera
+              </button>
+
+              <button type="button" class="tool-btn" id="answer-paste">
+                📋 Paste
+              </button>
+            </div>
+
+            <input type="file" id="answer-file" accept="image/*" hidden />
+
+            <div class="image-preview answer-preview" id="answer-preview">
+              <div class="empty-preview">
+                <span>📝</span>
+
+                <p>
+                  You can type your answer or upload a photo of your handwritten
+                  answer.
+                </p>
+              </div>
+            </div>
+
+            <textarea
+              id="essay"
+              class="essay-textarea"
+              placeholder="Start writing your answer here..."
+              spellcheck="true"
+            ></textarea>
+
+            <div class="writing-bottom">
+              <div class="minimum-info">
+                <span>
+                  Minimum:
+                  <strong id="min">150</strong> words
+                </span>
+
+                <div class="progress-track" id="word-progress">
+                  <div class="progress-fill"></div>
+                </div>
+              </div>
+
+              <div class="suggestion" id="suggest">
+                Keep developing your ideas.
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <!-- WRITING CONTROL -->
+
+        <div class="writing-control card">
+          <div class="timer-box">
+            <span class="timer-label"> TIME </span>
+
+            <strong id="timer"> 20:00 </strong>
+          </div>
+
+          <button type="button" class="primary-btn" id="submit-writing">
+            <span>Evaluate My Writing</span>
+            <span>→</span>
+          </button>
+        </div>
+
+        <div class="error-box" id="writing-error" hidden></div>
+
+        <!-- WRITING RESULT -->
+
+        <section class="result-section" id="writing-result" hidden>
+          <div class="result-header">
+            <div>
+              <span class="eyebrow"> AI ASSESSMENT </span>
+
+              <h2>Writing Result</h2>
+            </div>
+
+            <div class="overall-score">
+              <span>Overall</span>
+              <strong id="writing-overall"> — </strong>
+            </div>
+          </div>
+
+          <div class="score-grid">
+            <div class="score-card">
+              <span>Task Achievement</span>
+              <strong id="writing-task-score">—</strong>
+            </div>
+
+            <div class="score-card">
+              <span>Coherence & Cohesion</span>
+              <strong id="writing-coherence-score">—</strong>
+            </div>
+
+            <div class="score-card">
+              <span>Lexical Resource</span>
+              <strong id="writing-lexical-score">—</strong>
+            </div>
+
+            <div class="score-card">
+              <span>Grammar</span>
+              <strong id="writing-grammar-score">—</strong>
+            </div>
+          </div>
+
+          <div class="result-grid">
+            <div class="result-card">
+              <h3>Summary</h3>
+
+              <p id="writing-summary"></p>
+            </div>
+
+            <div class="result-card">
+              <h3>Strengths</h3>
+
+              <ul id="writing-strengths"></ul>
+            </div>
+
+            <div class="result-card">
+              <h3>Weaknesses</h3>
+
+              <ul id="writing-weaknesses"></ul>
+            </div>
+
+            <div class="result-card">
+              <h3>Grammar corrections</h3>
+
+              <ul id="writing-corrections"></ul>
+            </div>
+
+            <div class="result-card">
+              <h3>Vocabulary</h3>
+
+              <ul id="writing-vocabulary"></ul>
+            </div>
+
+            <div class="result-card">
+              <h3>Next steps</h3>
+
+              <p id="writing-next-steps"></p>
+            </div>
+          </div>
+        </section>
+      </section>
+
+      <!-- =====================================================
+     SPEAKING MODE
+===================================================== -->
+
+      <section class="mode-panel" id="speaking-mode">
+        <div class="section-heading">
+          <div>
+            <span class="eyebrow"> IELTS Speaking </span>
+
+            <h2>Speaking Practice</h2>
+
+            <p>Record your answers and receive IELTS-style feedback.</p>
+          </div>
+        </div>
+
+        <!-- SPEAKING PART NAV -->
+
+        <div class="speaking-tabs">
+          <button
+            type="button"
+            class="speaking-tab active"
+            id="part1-tab"
+            data-part="1"
+          >
+            <span>Part 1</span>
+            <small>Interview</small>
+          </button>
+
+          <button
+            type="button"
+            class="speaking-tab"
+            id="part2-tab"
+            data-part="2"
+          >
+            <span>Part 2</span>
+            <small>Long turn</small>
+          </button>
+
+          <button
+            type="button"
+            class="speaking-tab"
+            id="part3-tab"
+            data-part="3"
+          >
+            <span>Part 3</span>
+            <small>Discussion</small>
+          </button>
+        </div>
+
+        <!-- =================================================
+         PART 1
+    ================================================== -->
+
+        <section class="speaking-panel active" id="part1-panel">
+          <div class="speaking-question-card">
+            <div class="question-meta">
+              <span class="part-label"> PART 1 </span>
+
+              <span id="part1-count"> Question 1 / 5 </span>
+            </div>
+
+            <h2 id="part1-question">Let's talk about your hometown.</h2>
+
+            <p class="speaking-hint">
+              Give a natural answer of around 15–30 seconds.
+            </p>
+          </div>
+
+          <div class="recorder-card">
+            <div class="record-status">
+              <span class="record-dot" id="record-dot"></span>
+
+              <span id="record-status-text"> Ready to record </span>
+            </div>
+
+            <div class="record-timer" id="record-timer">00:00</div>
+
+            <div class="record-wave" id="record-wave">
+              <span></span>
+              <span></span>
+              <span></span>
+              <span></span>
+              <span></span>
+              <span></span>
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+
+            <!-- ONE TOGGLE BUTTON -->
+
+            <button type="button" class="record-main-btn" id="record-toggle">
+              <span class="record-main-icon" id="record-toggle-icon"> 🎙 </span>
+
+              <span id="record-toggle-text"> Start recording </span>
+            </button>
+
+            <p class="record-help">
+              Press once to start. Press again when you finish speaking.
+            </p>
+          </div>
+
+          <div class="part-navigation">
+            <button type="button" class="secondary-btn" id="part1-next">
+              Next question →
+            </button>
+          </div>
+        </section>
+
+        <!-- =================================================
+         PART 2
+    ================================================== -->
+
+        <section class="speaking-panel" id="part2-panel">
+          <div class="speaking-question-card">
+            <div class="question-meta">
+              <span class="part-label"> PART 2 </span>
+
+              <span> Long turn </span>
+            </div>
+
+            <h2 id="part2-question">
+              Describe a memorable journey you have taken.
+            </h2>
+
+            <p class="speaking-instructions" id="part2-instructions">
+              You have 1 minute to prepare. You should speak for up to 2
+              minutes.
+            </p>
+          </div>
+
+          <div class="prep-card">
+            <span class="prep-label"> PREPARATION </span>
+
+            <strong id="prep-timer"> 01:00 </strong>
+
+            <button type="button" class="primary-btn" id="start-prep">
+              Start 1-minute preparation
+            </button>
+          </div>
+        </section>
+
+        <!-- =================================================
+         PART 3
+    ================================================== -->
+
+        <section class="speaking-panel" id="part3-panel">
+          <div class="speaking-question-card">
+            <div class="question-meta">
+              <span class="part-label"> PART 3 </span>
+
+              <span id="part3-count"> Question 1 / 5 </span>
+            </div>
+
+            <h2 id="part3-question">Why do people enjoy travelling?</h2>
+
+            <p class="speaking-hint">
+              Give a developed answer and explain your ideas.
+            </p>
+          </div>
+
+          <div class="part-navigation">
+            <button type="button" class="secondary-btn" id="part3-next">
+              Next question →
+            </button>
+          </div>
+        </section>
+
+        <!-- =================================================
+         SPEAKING ANSWERS
+    ================================================== -->
+
+        <section class="answers-section card">
+          <div class="card-header">
+            <div>
+              <span class="card-kicker"> YOUR ANSWERS </span>
+
+              <h3>Recorded responses</h3>
+            </div>
+
+            <span class="answers-count" id="speaking-count"> 0 / 5 </span>
+          </div>
+
+          <div class="answers-list" id="speaking-answers">
+            <div class="empty-answers">
+              Your recorded answers will appear here.
+            </div>
+          </div>
+
+          <button
+            type="button"
+            class="primary-btn evaluate-btn"
+            id="evaluate-speaking"
+            disabled
+          >
+            <span>Evaluate My Speaking</span>
+            <span>→</span>
+          </button>
+
+          <div class="error-box" id="speaking-error" hidden></div>
+
+          <div class="report-status" id="speaking-report-status"></div>
+        </section>
+
+        <!-- =================================================
+         SPEAKING RESULT
+    ================================================== -->
+
+        <section class="result-section" id="speaking-result" hidden>
+          <div class="result-header">
+            <div>
+              <span class="eyebrow"> AI ASSESSMENT </span>
+
+              <h2>Speaking Result</h2>
+            </div>
+
+            <div class="overall-score">
+              <span> Overall </span>
+
+              <strong id="speaking-overall"> — </strong>
+            </div>
+          </div>
+
+          <div class="score-grid">
+            <div class="score-card">
+              <span>Fluency & Coherence</span>
+              <strong id="speaking-fluency">—</strong>
+            </div>
+
+            <div class="score-card">
+              <span>Lexical Resource</span>
+              <strong id="speaking-lexical">—</strong>
+            </div>
+
+            <div class="score-card">
+              <span>Grammar</span>
+              <strong id="speaking-grammar">—</strong>
+            </div>
+
+            <div class="score-card">
+              <span>Pronunciation</span>
+              <strong id="speaking-pronunciation">—</strong>
+            </div>
+          </div>
+
+          <div class="result-grid">
+            <div class="result-card">
+              <h3>Summary</h3>
+
+              <p id="speaking-summary"></p>
+            </div>
+
+            <div class="result-card">
+              <h3>Strengths</h3>
+
+              <ul id="speaking-strengths"></ul>
+            </div>
+
+            <div class="result-card">
+              <h3>Weaknesses</h3>
+
+              <ul id="speaking-weaknesses"></ul>
+            </div>
+
+            <div class="result-card">
+              <h3>Grammar corrections</h3>
+
+              <ul id="speaking-corrections"></ul>
+            </div>
+
+            <div class="result-card">
+              <h3>Vocabulary</h3>
+
+              <ul id="speaking-vocabulary"></ul>
+            </div>
+
+            <div class="result-card">
+              <h3>Fluency advice</h3>
+
+              <ul id="speaking-fluency-advice"></ul>
+            </div>
+
+            <div class="result-card">
+              <h3>Pronunciation advice</h3>
+
+              <ul id="speaking-pronunciation-advice"></ul>
+            </div>
+
+            <div class="result-card">
+              <h3>Next steps</h3>
+
+              <ul id="speaking-next-steps"></ul>
+            </div>
+          </div>
+        </section>
+      </section>
+    </main>
+
+    <!-- =====================================================
+     CAMERA MODAL
+===================================================== -->
+
+    <div class="camera-modal" id="camera-modal" hidden>
+      <div class="camera-overlay"></div>
+
+      <div class="camera-box">
+        <div class="camera-header">
+          <div>
+            <span class="card-kicker"> CAMERA </span>
+
+            <h3>Take a photo</h3>
+          </div>
+
+          <button
+            type="button"
+            class="icon-btn"
+            id="camera-close"
+            aria-label="Close camera"
+          >
+            ×
+          </button>
+        </div>
+
+        <video id="camera-video" autoplay playsinline></video>
+
+        <canvas id="camera-canvas" hidden></canvas>
+
+        <div class="camera-actions">
+          <button type="button" class="secondary-btn" id="camera-cancel">
+            Cancel
+          </button>
+
+          <button type="button" class="primary-btn" id="camera-capture">
+            Capture
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- =====================================================
+     JAVASCRIPT
+===================================================== -->
+
+    <script src="/script.js"></script>
+  </body>
+</html>
