@@ -1,8 +1,10 @@
 @import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap");
 
 /* =========================================================
+
    RESET
-========================================================= */
+
+\========================================================= */
 
 *,
 *::before,
@@ -12,16 +14,19 @@
 
 html {
   min-height: 100%;
+
   scroll-behavior: smooth;
 }
 
 body {
   margin: 0;
+
   min-height: 100vh;
 
   font-family: "Space Grotesk", sans-serif;
 
   background: var(--bg);
+
   color: var(--text);
 
   transition:
@@ -54,30 +59,42 @@ textarea {
 }
 
 /* =========================================================
+
    THEME VARIABLES
-========================================================= */
+
+\========================================================= */
 
 :root {
   --bg: #f4f7f9;
+
   --surface: #ffffff;
+
   --surface-soft: #f8fafb;
+
   --surface-hover: #f0f4f6;
 
   --border: #dfe7eb;
+
   --border-strong: #cbd7dd;
 
   --text: #102027;
+
   --text-soft: #64757d;
+
   --text-muted: #8a999f;
 
   --primary: #12a878;
+
   --primary-dark: #087d59;
+
   --primary-soft: #e6f7f0;
 
   --danger: #dc4d4d;
+
   --danger-soft: #fff0f0;
 
   --warning: #d88a16;
+
   --warning-soft: #fff6e6;
 
   --shadow-sm: 0 4px 14px rgba(16, 32, 39, 0.06);
@@ -85,7 +102,9 @@ textarea {
   --shadow: 0 12px 35px rgba(16, 32, 39, 0.09);
 
   --radius-sm: 10px;
+
   --radius: 16px;
+
   --radius-lg: 22px;
 
   --container: 1280px;
@@ -93,25 +112,35 @@ textarea {
 
 :root[data-theme="dark"] {
   --bg: #0b1418;
+
   --surface: #101e24;
+
   --surface-soft: #14252c;
+
   --surface-hover: #1a3038;
 
   --border: #294049;
+
   --border-strong: #39545e;
 
   --text: #eef6f8;
+
   --text-soft: #a8bac1;
+
   --text-muted: #71868e;
 
   --primary: #22c995;
+
   --primary-dark: #0ea878;
+
   --primary-soft: rgba(34, 201, 149, 0.13);
 
   --danger: #ff6d6d;
+
   --danger-soft: rgba(255, 109, 109, 0.12);
 
   --warning: #f1b24b;
+
   --warning-soft: rgba(241, 178, 75, 0.12);
 
   --shadow-sm: 0 4px 16px rgba(0, 0, 0, 0.22);
@@ -120,31 +149,42 @@ textarea {
 }
 
 /* =========================================================
+
    TOPBAR
-========================================================= */
+
+\========================================================= */
 
 .topbar {
   width: 100%;
+
   min-height: 82px;
 
   display: flex;
+
   align-items: center;
+
   justify-content: space-between;
+
   gap: 24px;
 
   padding: 16px 5vw;
 
   background: var(--surface);
+
   border-bottom: 1px solid var(--border);
 
   position: sticky;
+
   top: 0;
+
   z-index: 100;
 }
 
 .brand {
   display: flex;
+
   align-items: center;
+
   gap: 13px;
 
   min-width: 0;
@@ -152,22 +192,35 @@ textarea {
 
 .brand-mark {
   width: 58px;
+
   height: 58px;
+
   border-radius: 16px;
+
   overflow: hidden;
+
   display: flex;
+
   align-items: center;
+
   justify-content: center;
+
   background: #ffffff;
+
   border: 1px solid rgba(39, 124, 145, 0.12);
+
   box-shadow: 0 12px 30px rgba(39, 124, 145, 0.18);
+
   flex-shrink: 0;
 }
 
 .brand-mark img {
   width: 100%;
+
   height: 100%;
+
   object-fit: contain;
+
   display: block;
 }
 
@@ -177,7 +230,9 @@ textarea {
   color: var(--text);
 
   font-size: 20px;
+
   line-height: 1.15;
+
   font-weight: 700;
 
   white-space: nowrap;
@@ -189,12 +244,15 @@ textarea {
   color: var(--text-soft);
 
   font-size: 12px;
+
   line-height: 1.3;
 }
 
 .top-actions {
   display: flex;
+
   align-items: center;
+
   gap: 10px;
 }
 
@@ -202,19 +260,25 @@ textarea {
   min-height: 40px;
 
   display: inline-flex;
+
   align-items: center;
+
   justify-content: center;
+
   gap: 8px;
 
   padding: 0 13px;
 
   border: 1px solid var(--border);
+
   border-radius: 10px;
 
   background: var(--surface);
+
   color: var(--text);
 
   font-size: 13px;
+
   font-weight: 600;
 
   transition:
@@ -225,7 +289,9 @@ textarea {
 
 .theme-btn:hover {
   background: var(--surface-hover);
+
   border-color: var(--border-strong);
+
   transform: translateY(-1px);
 }
 
@@ -234,16 +300,20 @@ textarea {
 }
 
 /* =========================================================
+
    MODE NAV
-========================================================= */
+
+\========================================================= */
 
 .mode-nav {
   width: min(100%, var(--container));
 
   margin: 22px auto 0;
+
   padding: 0 24px;
 
   display: flex;
+
   gap: 8px;
 }
 
@@ -251,19 +321,25 @@ textarea {
   min-height: 46px;
 
   display: inline-flex;
+
   align-items: center;
+
   justify-content: center;
+
   gap: 8px;
 
   padding: 0 18px;
 
   border: 1px solid var(--border);
+
   border-radius: 12px;
 
   background: var(--surface);
+
   color: var(--text-soft);
 
   font-size: 14px;
+
   font-weight: 600;
 
   transition:
@@ -275,31 +351,39 @@ textarea {
 
 .mode-tab:hover {
   color: var(--text);
+
   background: var(--surface-hover);
 }
 
 .mode-tab.active {
   color: #ffffff;
+
   background: var(--primary);
+
   border-color: var(--primary);
 
   box-shadow: 0 7px 18px rgba(18, 168, 120, 0.18);
 }
 
 /* =========================================================
+
    APP CONTAINER
-========================================================= */
+
+\========================================================= */
 
 .app-container {
   width: min(100%, var(--container));
 
   margin: 0 auto;
+
   padding: 28px 24px 70px;
 }
 
 /* =========================================================
+
    MODE PANELS
-========================================================= */
+
+\========================================================= */
 
 .mode-panel {
   display: none;
@@ -312,13 +396,18 @@ textarea {
 }
 
 /* =========================================================
+
    SECTION HEADING
-========================================================= */
+
+\========================================================= */
 
 .section-heading {
   display: flex;
+
   align-items: flex-end;
+
   justify-content: space-between;
+
   gap: 24px;
 
   margin-bottom: 24px;
@@ -332,10 +421,13 @@ textarea {
   color: var(--primary);
 
   font-size: 11px;
+
   line-height: 1;
+
   font-weight: 700;
 
   letter-spacing: 0.12em;
+
   text-transform: uppercase;
 }
 
@@ -345,7 +437,9 @@ textarea {
   color: var(--text);
 
   font-size: clamp(27px, 4vw, 38px);
+
   line-height: 1.08;
+
   font-weight: 700;
 
   letter-spacing: -0.04em;
@@ -359,15 +453,19 @@ textarea {
   color: var(--text-soft);
 
   font-size: 14px;
+
   line-height: 1.65;
 }
 
 /* =========================================================
+
    TASK SELECTOR
-========================================================= */
+
+\========================================================= */
 
 .task-selector {
   display: flex;
+
   gap: 6px;
 
   padding: 5px;
@@ -375,6 +473,7 @@ textarea {
   flex: 0 0 auto;
 
   border: 1px solid var(--border);
+
   border-radius: 13px;
 
   background: var(--surface);
@@ -386,12 +485,15 @@ textarea {
   padding: 0 15px;
 
   border: 0;
+
   border-radius: 9px;
 
   background: transparent;
+
   color: var(--text-soft);
 
   font-size: 13px;
+
   font-weight: 600;
 
   transition:
@@ -401,17 +503,21 @@ textarea {
 
 .task-btn.active {
   background: var(--primary);
+
   color: #ffffff;
 }
 
 /* =========================================================
+
    CARDS
-========================================================= */
+
+\========================================================= */
 
 .card {
   min-width: 0;
 
   border: 1px solid var(--border);
+
   border-radius: var(--radius);
 
   background: var(--surface);
@@ -423,8 +529,11 @@ textarea {
   min-width: 0;
 
   display: flex;
+
   align-items: center;
+
   justify-content: space-between;
+
   gap: 16px;
 
   padding: 20px 21px 0;
@@ -438,7 +547,9 @@ textarea {
   color: var(--text-muted);
 
   font-size: 10px;
+
   line-height: 1;
+
   font-weight: 700;
 
   letter-spacing: 0.12em;
@@ -450,13 +561,17 @@ textarea {
   color: var(--text);
 
   font-size: 17px;
+
   line-height: 1.25;
+
   font-weight: 700;
 }
 
 /* =========================================================
+
    WRITING GRID
-========================================================= */
+
+\========================================================= */
 
 .writing-grid {
   display: grid;
@@ -471,6 +586,7 @@ textarea {
 .question-card,
 .answer-card {
   min-width: 0;
+
   overflow: hidden;
 }
 
@@ -482,20 +598,26 @@ textarea {
   border-radius: 8px;
 
   background: var(--primary-soft);
+
   color: var(--primary);
 
   font-size: 11px;
+
   font-weight: 700;
 }
 
 /* =========================================================
+
    WRITING TOOLS
-========================================================= */
+
+\========================================================= */
 
 .question-tools,
 .answer-tools {
   display: flex;
+
   flex-wrap: wrap;
+
   gap: 7px;
 
   padding: 18px 21px 0;
@@ -505,19 +627,25 @@ textarea {
   min-height: 34px;
 
   display: inline-flex;
+
   align-items: center;
+
   justify-content: center;
+
   gap: 6px;
 
   padding: 0 11px;
 
   border: 1px solid var(--border);
+
   border-radius: 9px;
 
   background: var(--surface-soft);
+
   color: var(--text-soft);
 
   font-size: 12px;
+
   font-weight: 600;
 
   transition:
@@ -528,13 +656,17 @@ textarea {
 
 .tool-btn:hover {
   background: var(--surface-hover);
+
   color: var(--text);
+
   border-color: var(--border-strong);
 }
 
 /* =========================================================
+
    IMAGE PREVIEW
-========================================================= */
+
+\========================================================= */
 
 .image-preview {
   min-height: 190px;
@@ -542,12 +674,15 @@ textarea {
   margin: 16px 21px 0;
 
   display: flex;
+
   align-items: center;
+
   justify-content: center;
 
   overflow: hidden;
 
   border: 1px dashed var(--border-strong);
+
   border-radius: 13px;
 
   background: var(--surface-soft);
@@ -559,6 +694,7 @@ textarea {
 
 .image-preview img {
   width: 100%;
+
   max-height: 360px;
 
   display: block;
@@ -588,12 +724,15 @@ textarea {
   color: var(--text-muted);
 
   font-size: 12px;
+
   line-height: 1.55;
 }
 
 /* =========================================================
+
    TEXTAREAS
-========================================================= */
+
+\========================================================= */
 
 .question-textarea,
 .essay-textarea {
@@ -604,11 +743,13 @@ textarea {
   margin: 16px 21px 21px;
 
   border: 1px solid var(--border);
+
   border-radius: 12px;
 
   outline: none;
 
   background: var(--surface-soft);
+
   color: var(--text);
 
   line-height: 1.65;
@@ -650,12 +791,16 @@ textarea {
 }
 
 /* =========================================================
+
    WORD COUNT
-========================================================= */
+
+\========================================================= */
 
 .word-counter {
   display: flex;
+
   align-items: baseline;
+
   gap: 5px;
 
   flex: 0 0 auto;
@@ -669,6 +814,7 @@ textarea {
   color: var(--text);
 
   font-size: 22px;
+
   font-weight: 700;
 }
 
@@ -702,6 +848,7 @@ textarea {
 
 .progress-track {
   width: 100%;
+
   height: 6px;
 
   overflow: hidden;
@@ -713,6 +860,7 @@ textarea {
 
 .progress-fill {
   width: 0%;
+
   height: 100%;
 
   border-radius: inherit;
@@ -730,31 +878,41 @@ textarea {
   border-radius: 10px;
 
   background: var(--primary-soft);
+
   color: var(--primary);
 
   font-size: 11px;
+
   line-height: 1.45;
 }
 
 /* =========================================================
+
    WRITING CONTROL
-========================================================= */
+
+\========================================================= */
 
 .writing-control {
   min-height: 82px;
 
   margin-top: 18px;
+
   padding: 15px 17px;
 
   display: flex;
+
   align-items: center;
+
   justify-content: space-between;
+
   gap: 18px;
 }
 
 .timer-box {
   display: flex;
+
   align-items: center;
+
   gap: 12px;
 }
 
@@ -762,6 +920,7 @@ textarea {
   color: var(--text-muted);
 
   font-size: 10px;
+
   font-weight: 700;
 
   letter-spacing: 0.12em;
@@ -771,6 +930,7 @@ textarea {
   color: var(--text);
 
   font-size: 25px;
+
   font-weight: 700;
 
   font-variant-numeric: tabular-nums;
@@ -785,16 +945,21 @@ textarea {
 }
 
 /* =========================================================
+
    BUTTONS
-========================================================= */
+
+\========================================================= */
 
 .primary-btn,
 .secondary-btn {
   min-height: 44px;
 
   display: inline-flex;
+
   align-items: center;
+
   justify-content: center;
+
   gap: 9px;
 
   border-radius: 11px;
@@ -802,6 +967,7 @@ textarea {
   padding: 0 17px;
 
   font-size: 13px;
+
   font-weight: 700;
 
   transition:
@@ -813,7 +979,9 @@ textarea {
 
 .primary-btn {
   border: 1px solid var(--primary);
+
   background: var(--primary);
+
   color: #ffffff;
 
   box-shadow: 0 7px 18px rgba(18, 168, 120, 0.18);
@@ -821,6 +989,7 @@ textarea {
 
 .primary-btn:hover:not(:disabled) {
   background: var(--primary-dark);
+
   border-color: var(--primary-dark);
 
   transform: translateY(-1px);
@@ -836,38 +1005,49 @@ textarea {
 
 .secondary-btn {
   border: 1px solid var(--border);
+
   background: var(--surface);
+
   color: var(--text);
 }
 
 .secondary-btn:hover:not(:disabled) {
   background: var(--surface-hover);
+
   border-color: var(--border-strong);
 
   transform: translateY(-1px);
 }
 
 /* =========================================================
+
    ERROR
-========================================================= */
+
+\========================================================= */
 
 .error-box {
   margin-top: 15px;
+
   padding: 12px 14px;
 
   border: 1px solid rgba(220, 77, 77, 0.3);
+
   border-radius: 11px;
 
   background: var(--danger-soft);
+
   color: var(--danger);
 
   font-size: 12px;
+
   line-height: 1.5;
 }
 
 /* =========================================================
+
    SPEAKING TABS
-========================================================= */
+
+\========================================================= */
 
 .speaking-tabs {
   display: grid;
@@ -885,8 +1065,11 @@ textarea {
   min-height: 62px;
 
   display: flex;
+
   flex-direction: column;
+
   align-items: flex-start;
+
   justify-content: center;
 
   gap: 3px;
@@ -894,9 +1077,11 @@ textarea {
   padding: 10px 14px;
 
   border: 1px solid var(--border);
+
   border-radius: 13px;
 
   background: var(--surface);
+
   color: var(--text-soft);
 
   text-align: left;
@@ -909,6 +1094,7 @@ textarea {
 
 .speaking-tab span {
   font-size: 14px;
+
   font-weight: 700;
 }
 
@@ -924,13 +1110,17 @@ textarea {
 
 .speaking-tab.active {
   background: var(--primary-soft);
+
   color: var(--primary);
+
   border-color: rgba(18, 168, 120, 0.35);
 }
 
 /* =========================================================
+
    SPEAKING PANELS
-========================================================= */
+
+\========================================================= */
 
 .speaking-panel {
   display: none;
@@ -943,13 +1133,16 @@ textarea {
 }
 
 /* =========================================================
+
    SPEAKING QUESTION
-========================================================= */
+
+\========================================================= */
 
 .speaking-question-card {
   padding: 26px;
 
   border: 1px solid var(--border);
+
   border-radius: var(--radius-lg);
 
   background: var(--surface);
@@ -959,8 +1152,11 @@ textarea {
 
 .question-meta {
   display: flex;
+
   align-items: center;
+
   justify-content: space-between;
+
   gap: 15px;
 
   margin-bottom: 19px;
@@ -976,9 +1172,11 @@ textarea {
   border-radius: 7px;
 
   background: var(--primary-soft);
+
   color: var(--primary);
 
   font-size: 10px;
+
   font-weight: 700;
 
   letter-spacing: 0.1em;
@@ -992,6 +1190,7 @@ textarea {
   color: var(--text);
 
   font-size: clamp(23px, 3.5vw, 34px);
+
   line-height: 1.2;
 
   letter-spacing: -0.035em;
@@ -1004,22 +1203,29 @@ textarea {
   color: var(--text-soft);
 
   font-size: 13px;
+
   line-height: 1.6;
 }
 
 /* =========================================================
+
    RECORDER
-========================================================= */
+
+\========================================================= */
 
 .recorder-card {
   margin-top: 18px;
+
   padding: 28px;
 
   display: flex;
+
   flex-direction: column;
+
   align-items: center;
 
   border: 1px solid var(--border);
+
   border-radius: var(--radius-lg);
 
   background: var(--surface);
@@ -1033,17 +1239,21 @@ textarea {
   min-height: 25px;
 
   display: inline-flex;
+
   align-items: center;
+
   gap: 8px;
 
   color: var(--text-soft);
 
   font-size: 12px;
+
   font-weight: 600;
 }
 
 .record-dot {
   width: 9px;
+
   height: 9px;
 
   border-radius: 50%;
@@ -1076,6 +1286,7 @@ textarea {
   color: var(--text);
 
   font-size: 36px;
+
   line-height: 1;
 
   font-weight: 700;
@@ -1089,13 +1300,17 @@ textarea {
   margin: 18px 0;
 
   display: flex;
+
   align-items: center;
+
   justify-content: center;
+
   gap: 5px;
 }
 
 .record-wave span {
   width: 4px;
+
   height: 13px;
 
   border-radius: 20px;
@@ -1153,22 +1368,29 @@ textarea {
 
 .record-main-btn {
   min-width: 220px;
+
   min-height: 52px;
 
   display: inline-flex;
+
   align-items: center;
+
   justify-content: center;
+
   gap: 10px;
 
   padding: 0 20px;
 
   border: 1px solid var(--primary);
+
   border-radius: 13px;
 
   background: var(--primary);
+
   color: #ffffff;
 
   font-size: 14px;
+
   font-weight: 700;
 
   box-shadow: 0 8px 20px rgba(18, 168, 120, 0.2);
@@ -1181,6 +1403,7 @@ textarea {
 
 .record-main-btn:hover {
   background: var(--primary-dark);
+
   border-color: var(--primary-dark);
 
   transform: translateY(-1px);
@@ -1188,6 +1411,7 @@ textarea {
 
 .record-main-btn.recording {
   background: var(--danger);
+
   border-color: var(--danger);
 
   box-shadow: 0 8px 20px rgba(220, 77, 77, 0.2);
@@ -1195,6 +1419,7 @@ textarea {
 
 .record-main-btn.recording:hover {
   background: #c73e3e;
+
   border-color: #c73e3e;
 }
 
@@ -1210,31 +1435,39 @@ textarea {
   color: var(--text-muted);
 
   font-size: 11px;
+
   line-height: 1.5;
 }
 
 .part-navigation {
   display: flex;
+
   justify-content: flex-end;
 
   margin-top: 14px;
 }
 
 /* =========================================================
+
    PART 2 PREPARATION
-========================================================= */
+
+\========================================================= */
 
 .prep-card {
   margin-top: 18px;
+
   padding: 30px;
 
   display: flex;
+
   flex-direction: column;
+
   align-items: center;
 
   gap: 15px;
 
   border: 1px solid var(--border);
+
   border-radius: var(--radius-lg);
 
   background: var(--surface);
@@ -1248,6 +1481,7 @@ textarea {
   color: var(--text-muted);
 
   font-size: 10px;
+
   font-weight: 700;
 
   letter-spacing: 0.12em;
@@ -1257,6 +1491,7 @@ textarea {
   color: var(--text);
 
   font-size: clamp(44px, 7vw, 70px);
+
   line-height: 1;
 
   font-weight: 700;
@@ -1265,11 +1500,14 @@ textarea {
 }
 
 /* =========================================================
+
    ANSWERS
-========================================================= */
+
+\========================================================= */
 
 .answers-section {
   margin-top: 18px;
+
   padding-bottom: 20px;
 
   overflow: hidden;
@@ -1281,9 +1519,11 @@ textarea {
   border-radius: 8px;
 
   background: var(--surface-soft);
+
   color: var(--text-soft);
 
   font-size: 11px;
+
   font-weight: 700;
 }
 
@@ -1291,6 +1531,7 @@ textarea {
   min-height: 80px;
 
   display: flex;
+
   flex-direction: column;
 
   gap: 8px;
@@ -1302,6 +1543,7 @@ textarea {
   padding: 22px;
 
   border: 1px dashed var(--border);
+
   border-radius: 11px;
 
   color: var(--text-muted);
@@ -1315,6 +1557,7 @@ textarea {
   padding: 14px;
 
   border: 1px solid var(--border);
+
   border-radius: 11px;
 
   background: var(--surface-soft);
@@ -1322,7 +1565,9 @@ textarea {
 
 .answer-item-header {
   display: flex;
+
   align-items: center;
+
   justify-content: space-between;
 
   gap: 10px;
@@ -1334,9 +1579,11 @@ textarea {
   color: var(--primary);
 
   font-size: 10px;
+
   font-weight: 700;
 
   letter-spacing: 0.08em;
+
   text-transform: uppercase;
 }
 
@@ -1352,6 +1599,7 @@ textarea {
   color: var(--text);
 
   font-size: 12px;
+
   line-height: 1.6;
 
   overflow-wrap: anywhere;
@@ -1364,8 +1612,10 @@ textarea {
 }
 
 /* =========================================================
+
    REPORT STATUS
-========================================================= */
+
+\========================================================= */
 
 .report-status {
   min-height: 20px;
@@ -1380,8 +1630,10 @@ textarea {
 }
 
 /* =========================================================
+
    RESULTS
-========================================================= */
+
+\========================================================= */
 
 .result-section {
   margin-top: 25px;
@@ -1389,7 +1641,9 @@ textarea {
 
 .result-header {
   display: flex;
+
   align-items: flex-end;
+
   justify-content: space-between;
 
   gap: 20px;
@@ -1403,6 +1657,7 @@ textarea {
   color: var(--text);
 
   font-size: 28px;
+
   line-height: 1.1;
 }
 
@@ -1412,6 +1667,7 @@ textarea {
   padding: 14px 17px;
 
   border: 1px solid var(--border);
+
   border-radius: 13px;
 
   background: var(--surface);
@@ -1429,6 +1685,7 @@ textarea {
   color: var(--text-muted);
 
   font-size: 10px;
+
   font-weight: 600;
 }
 
@@ -1436,6 +1693,7 @@ textarea {
   color: var(--primary);
 
   font-size: 37px;
+
   line-height: 1;
 
   font-weight: 700;
@@ -1457,6 +1715,7 @@ textarea {
   padding: 17px;
 
   border: 1px solid var(--border);
+
   border-radius: 13px;
 
   background: var(--surface);
@@ -1472,6 +1731,7 @@ textarea {
   color: var(--text-soft);
 
   font-size: 11px;
+
   line-height: 1.35;
 }
 
@@ -1483,6 +1743,7 @@ textarea {
   color: var(--text);
 
   font-size: 29px;
+
   line-height: 1;
 }
 
@@ -1500,6 +1761,7 @@ textarea {
   padding: 19px;
 
   border: 1px solid var(--border);
+
   border-radius: 13px;
 
   background: var(--surface);
@@ -1521,6 +1783,7 @@ textarea {
   color: var(--text-soft);
 
   font-size: 12px;
+
   line-height: 1.7;
 
   overflow-wrap: anywhere;
@@ -1528,11 +1791,13 @@ textarea {
 
 .result-card ul {
   margin: 0;
+
   padding-left: 18px;
 
   color: var(--text-soft);
 
   font-size: 12px;
+
   line-height: 1.7;
 }
 
@@ -1541,16 +1806,20 @@ textarea {
 }
 
 /* =========================================================
+
    CAMERA MODAL
-========================================================= */
+
+\========================================================= */
 
 .camera-modal {
   position: fixed;
+
   inset: 0;
 
   z-index: 1000;
 
   display: grid;
+
   place-items: center;
 
   padding: 20px;
@@ -1558,6 +1827,7 @@ textarea {
 
 .camera-overlay {
   position: absolute;
+
   inset: 0;
 
   background: rgba(0, 0, 0, 0.65);
@@ -1567,6 +1837,7 @@ textarea {
 
 .camera-box {
   position: relative;
+
   z-index: 1;
 
   width: min(100%, 720px);
@@ -1574,6 +1845,7 @@ textarea {
   overflow: hidden;
 
   border: 1px solid var(--border);
+
   border-radius: 18px;
 
   background: var(--surface);
@@ -1585,7 +1857,9 @@ textarea {
   min-height: 70px;
 
   display: flex;
+
   align-items: center;
+
   justify-content: space-between;
 
   gap: 15px;
@@ -1605,18 +1879,23 @@ textarea {
 
 .icon-btn {
   width: 38px;
+
   height: 38px;
 
   display: grid;
+
   place-items: center;
 
   border: 1px solid var(--border);
+
   border-radius: 10px;
 
   background: var(--surface-soft);
+
   color: var(--text);
 
   font-size: 23px;
+
   line-height: 1;
 }
 
@@ -1626,7 +1905,9 @@ textarea {
 
 #camera-video {
   width: 100%;
+
   height: auto;
+
   min-height: 320px;
 
   display: block;
@@ -1638,6 +1919,7 @@ textarea {
 
 .camera-actions {
   display: flex;
+
   justify-content: flex-end;
 
   gap: 9px;
@@ -1646,19 +1928,24 @@ textarea {
 }
 
 /* =========================================================
+
    LOADING STATE
-========================================================= */
+
+\========================================================= */
 
 .is-loading {
   pointer-events: none;
+
   opacity: 0.65;
 }
 
 .loading-spinner {
   width: 16px;
+
   height: 16px;
 
   border: 2px solid rgba(255, 255, 255, 0.35);
+
   border-top-color: #ffffff;
 
   border-radius: 50%;
@@ -1673,8 +1960,10 @@ textarea {
 }
 
 /* =========================================================
+
    RESPONSIVE
-========================================================= */
+
+\========================================================= */
 
 @media (max-width: 980px) {
   .writing-grid {
@@ -1705,6 +1994,7 @@ textarea {
 
   .brand-mark {
     width: 40px;
+
     height: 40px;
   }
 
@@ -1714,6 +2004,7 @@ textarea {
 
   .mode-nav {
     margin-top: 14px;
+
     padding: 0 16px;
   }
 
@@ -1727,6 +2018,7 @@ textarea {
 
   .section-heading {
     align-items: stretch;
+
     flex-direction: column;
   }
 
@@ -1740,6 +2032,7 @@ textarea {
 
   .writing-control {
     align-items: stretch;
+
     flex-direction: column;
   }
 
@@ -1761,6 +2054,7 @@ textarea {
 
   .result-header {
     align-items: stretch;
+
     flex-direction: column;
   }
 
@@ -1780,6 +2074,7 @@ textarea {
 
   .card-header {
     align-items: flex-start;
+
     flex-direction: column;
   }
 
@@ -1803,16 +2098,19 @@ textarea {
     width: calc(100% - 28px);
 
     margin-left: 14px;
+
     margin-right: 14px;
   }
 
   .image-preview {
     margin-left: 14px;
+
     margin-right: 14px;
   }
 
   .writing-bottom {
     padding-left: 14px;
+
     padding-right: 14px;
   }
 
@@ -1832,6 +2130,7 @@ textarea {
 
   .record-main-btn {
     width: 100%;
+
     min-width: 0;
   }
 
@@ -1855,36 +2154,184 @@ textarea {
     width: calc(100% - 28px);
 
     margin-left: 14px;
+
     margin-right: 14px;
   }
 
   .answers-list {
     padding-left: 14px;
+
     padding-right: 14px;
   }
 
   .report-status {
     margin-left: 14px;
+
     margin-right: 14px;
   }
 }
 
 /* =========================================================
+
    ACCESSIBILITY
-========================================================= */
+
+\========================================================= */
 
 button:focus-visible,
 textarea:focus-visible,
 input:focus-visible {
   outline: 3px solid var(--primary-soft);
+
   outline-offset: 2px;
 }
 
 /* =========================================================
+
    SELECTION
-========================================================= */
+
+\========================================================= */
 
 ::selection {
   background: var(--primary);
+
   color: #ffffff;
+}
+
+/* Dashboard and saved assessment history */
+.dashboard-panel {
+  width: 100%;
+}
+.dashboard-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.dashboard-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  margin: 1.25rem 0;
+}
+.dashboard-stat,
+.dashboard-history-card {
+  border: 1px solid var(--border-color, rgba(120, 130, 150, 0.22));
+  border-radius: 18px;
+  padding: 1.15rem;
+  background: var(--card-bg, rgba(255, 255, 255, 0.72));
+}
+.dashboard-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+.dashboard-stat span,
+.dashboard-stat small,
+.dashboard-history-heading p,
+.dashboard-privacy-note {
+  color: var(--muted-text, #788196);
+  font-size: 0.88rem;
+}
+.dashboard-stat strong {
+  font-size: 2rem;
+  line-height: 1.15;
+}
+.dashboard-history-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+.dashboard-history-heading h3 {
+  margin: 0 0 0.35rem;
+}
+.dashboard-history-heading p {
+  margin: 0;
+}
+.dashboard-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+}
+.dashboard-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 680px;
+  text-align: left;
+}
+.dashboard-table th,
+.dashboard-table td {
+  padding: 0.85rem 0.65rem;
+  border-bottom: 1px solid var(--border-color, rgba(120, 130, 150, 0.18));
+  vertical-align: top;
+}
+.dashboard-table th {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted-text, #788196);
+}
+.history-type {
+  display: inline-block;
+  border-radius: 999px;
+  padding: 0.25rem 0.55rem;
+  font-size: 0.78rem;
+  text-transform: capitalize;
+  background: rgba(90, 110, 180, 0.12);
+}
+.history-type.speaking {
+  background: rgba(26, 160, 120, 0.13);
+}
+.history-summary {
+  min-width: 200px;
+  max-width: 360px;
+  color: var(--muted-text, #788196);
+}
+.dashboard-message {
+  color: var(--muted-text, #788196);
+  padding: 0.75rem 0;
+}
+.dashboard-privacy-note {
+  margin-top: 1rem;
+}
+.text-btn {
+  border: 0;
+  background: transparent;
+  color: var(--accent, #5267d8);
+  cursor: pointer;
+  font: inherit;
+}
+.site-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.25rem max(1rem, calc((100% - 1100px) / 2));
+  color: var(--muted-text, #788196);
+  font-size: 0.88rem;
+}
+.footer-links {
+  display: flex;
+  gap: 1rem;
+}
+.footer-links a {
+  color: inherit;
+  text-decoration: none;
+}
+.footer-links a:hover {
+  text-decoration: underline;
+}
+@media (max-width: 700px) {
+  .dashboard-stats {
+    grid-template-columns: 1fr;
+  }
+  .dashboard-heading,
+  .dashboard-history-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .site-footer {
+    align-items: flex-start;
+    flex-direction: column;
+  }
 }

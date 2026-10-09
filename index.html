@@ -1,4 +1,5 @@
 <!doctype html>
+
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -22,9 +23,11 @@
     <title>SBS AI Examiner | IELTS Writing & Speaking AI</title>
 
     <!-- SBS IELTS Favicon -->
+
     <link rel="icon" type="image/png" href="/image.png" />
 
     <!-- Google Fonts -->
+
     <link rel="preconnect" href="https://fonts.googleapis.com" />
 
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -35,9 +38,11 @@
     />
 
     <!-- Main CSS -->
+
     <link rel="stylesheet" href="/style.css" />
 
     <!-- Theme initialization -->
+
     <script>
       (function () {
         try {
@@ -57,16 +62,20 @@
 
   <body>
     <!-- =====================================================
+
      HEADER
-===================================================== -->
+
+\===================================================== -->
 
     <header class="topbar">
       <div class="brand">
         <div class="brand-mark">
           <img src="/image.png" alt="SBS IELTS" />
         </div>
+
         <div>
           <h1>IELTS AI Examiner</h1>
+
           <p>Practice smarter. Improve faster.</p>
         </div>
       </div>
@@ -79,14 +88,17 @@
           aria-label="Toggle dark mode"
         >
           <span id="theme-icon">☀</span>
+
           <span id="theme-text">Light</span>
         </button>
       </div>
     </header>
 
     <!-- =====================================================
+
      MODE NAVIGATION
-===================================================== -->
+
+\===================================================== -->
 
     <nav class="mode-nav">
       <button
@@ -96,6 +108,7 @@
         data-mode="writing"
       >
         <span>✍</span>
+
         <span>Writing</span>
       </button>
 
@@ -106,18 +119,33 @@
         data-mode="speaking"
       >
         <span>🎙</span>
+
         <span>Speaking</span>
+      </button>
+
+      <button
+        type="button"
+        class="mode-tab"
+        id="dashboard-tab"
+        data-mode="dashboard"
+      >
+        <span>📊</span>
+        <span>Dashboard</span>
       </button>
     </nav>
 
     <!-- =====================================================
+
      MAIN
-===================================================== -->
+
+\===================================================== -->
 
     <main class="app-container">
       <!-- =====================================================
+
      WRITING MODE
-===================================================== -->
+
+\===================================================== -->
 
       <section class="mode-panel active" id="writing-mode">
         <div class="section-heading">
@@ -210,6 +238,7 @@
 
               <div class="word-counter">
                 <strong id="words">0</strong>
+
                 <span>words</span>
               </div>
             </div>
@@ -252,6 +281,7 @@
               <div class="minimum-info">
                 <span>
                   Minimum:
+
                   <strong id="min">150</strong> words
                 </span>
 
@@ -278,6 +308,7 @@
 
           <button type="button" class="primary-btn" id="submit-writing">
             <span>Evaluate My Writing</span>
+
             <span>→</span>
           </button>
         </div>
@@ -296,6 +327,7 @@
 
             <div class="overall-score">
               <span>Overall</span>
+
               <strong id="writing-overall"> — </strong>
             </div>
           </div>
@@ -303,21 +335,25 @@
           <div class="score-grid">
             <div class="score-card">
               <span>Task Achievement</span>
+
               <strong id="writing-task-score">—</strong>
             </div>
 
             <div class="score-card">
               <span>Coherence & Cohesion</span>
+
               <strong id="writing-coherence-score">—</strong>
             </div>
 
             <div class="score-card">
               <span>Lexical Resource</span>
+
               <strong id="writing-lexical-score">—</strong>
             </div>
 
             <div class="score-card">
               <span>Grammar</span>
+
               <strong id="writing-grammar-score">—</strong>
             </div>
           </div>
@@ -363,8 +399,10 @@
       </section>
 
       <!-- =====================================================
+
      SPEAKING MODE
-===================================================== -->
+
+\===================================================== -->
 
       <section class="mode-panel" id="speaking-mode">
         <div class="section-heading">
@@ -387,6 +425,7 @@
             data-part="1"
           >
             <span>Part 1</span>
+
             <small>Interview</small>
           </button>
 
@@ -397,6 +436,7 @@
             data-part="2"
           >
             <span>Part 2</span>
+
             <small>Long turn</small>
           </button>
 
@@ -407,12 +447,15 @@
             data-part="3"
           >
             <span>Part 3</span>
+
             <small>Discussion</small>
           </button>
         </div>
 
         <!-- =================================================
+
          PART 1
+
     ================================================== -->
 
         <section class="speaking-panel active" id="part1-panel">
@@ -441,13 +484,21 @@
 
             <div class="record-wave" id="record-wave">
               <span></span>
+
               <span></span>
+
               <span></span>
+
               <span></span>
+
               <span></span>
+
               <span></span>
+
               <span></span>
+
               <span></span>
+
               <span></span>
             </div>
 
@@ -472,7 +523,9 @@
         </section>
 
         <!-- =================================================
+
          PART 2
+
     ================================================== -->
 
         <section class="speaking-panel" id="part2-panel">
@@ -505,7 +558,9 @@
         </section>
 
         <!-- =================================================
+
          PART 3
+
     ================================================== -->
 
         <section class="speaking-panel" id="part3-panel">
@@ -531,7 +586,9 @@
         </section>
 
         <!-- =================================================
+
          SPEAKING ANSWERS
+
     ================================================== -->
 
         <section class="answers-section card">
@@ -558,6 +615,7 @@
             disabled
           >
             <span>Evaluate My Speaking</span>
+
             <span>→</span>
           </button>
 
@@ -567,7 +625,9 @@
         </section>
 
         <!-- =================================================
+
          SPEAKING RESULT
+
     ================================================== -->
 
         <section class="result-section" id="speaking-result" hidden>
@@ -588,21 +648,25 @@
           <div class="score-grid">
             <div class="score-card">
               <span>Fluency & Coherence</span>
+
               <strong id="speaking-fluency">—</strong>
             </div>
 
             <div class="score-card">
               <span>Lexical Resource</span>
+
               <strong id="speaking-lexical">—</strong>
             </div>
 
             <div class="score-card">
               <span>Grammar</span>
+
               <strong id="speaking-grammar">—</strong>
             </div>
 
             <div class="score-card">
               <span>Pronunciation</span>
+
               <strong id="speaking-pronunciation">—</strong>
             </div>
           </div>
@@ -658,11 +722,77 @@
           </div>
         </section>
       </section>
+
+      <section
+        class="mode-panel dashboard-panel"
+        id="dashboard-mode"
+        aria-labelledby="dashboard-title"
+      >
+        <div class="section-heading dashboard-heading">
+          <div>
+            <span class="eyebrow">YOUR PROGRESS</span>
+            <h2 id="dashboard-title">Learning Dashboard</h2>
+            <p>Your saved Writing and Speaking results in one place.</p>
+          </div>
+          <button type="button" class="secondary-btn" id="refresh-dashboard">
+            ↻ Refresh
+          </button>
+        </div>
+        <div class="dashboard-stats" id="dashboard-stats" aria-live="polite">
+          <article class="dashboard-stat">
+            <span>Total attempts</span><strong id="dashboard-total">0</strong>
+          </article>
+          <article class="dashboard-stat">
+            <span>Writing average</span
+            ><strong id="dashboard-writing-average">—</strong
+            ><small id="dashboard-writing-count">0 attempts</small>
+          </article>
+          <article class="dashboard-stat">
+            <span>Speaking average</span
+            ><strong id="dashboard-speaking-average">—</strong
+            ><small id="dashboard-speaking-count">0 attempts</small>
+          </article>
+        </div>
+        <section class="dashboard-history-card">
+          <div class="dashboard-history-heading">
+            <div>
+              <h3>Recent results</h3>
+              <p>Latest 100 attempts for this browser.</p>
+            </div>
+            <button type="button" class="text-btn" id="clear-dashboard-history">
+              Clear history
+            </button>
+          </div>
+          <p class="dashboard-message" id="dashboard-message" role="status">
+            Loading saved results...
+          </p>
+          <div class="dashboard-table-wrap">
+            <table class="dashboard-table">
+              <thead>
+                <tr>
+                  <th>Type</th>
+                  <th>Task</th>
+                  <th>Band</th>
+                  <th>Date</th>
+                  <th>Feedback</th>
+                </tr>
+              </thead>
+              <tbody id="dashboard-history"></tbody>
+            </table>
+          </div>
+        </section>
+        <p class="dashboard-privacy-note">
+          History is separated by this browser. Clearing browser cookies or
+          using another browser creates a separate history.
+        </p>
+      </section>
     </main>
 
     <!-- =====================================================
+
      CAMERA MODAL
-===================================================== -->
+
+\===================================================== -->
 
     <div class="camera-modal" id="camera-modal" hidden>
       <div class="camera-overlay"></div>
@@ -702,9 +832,132 @@
     </div>
 
     <!-- =====================================================
-     JAVASCRIPT
-===================================================== -->
 
+     JAVASCRIPT
+
+\===================================================== -->
+
+    <footer class="site-footer">
+      <span>© SBS AI Examiner</span>
+      <span class="footer-links"
+        ><a
+          href="https://t.me/xosilbek_o1o"
+          target="_blank"
+          rel="noopener noreferrer"
+          >Contact</a
+        ><a
+          href="https://t.me/SBS_stars"
+          target="_blank"
+          rel="noopener noreferrer"
+          >SBS Stars</a
+        ></span
+      >
+    </footer>
     <script src="/script.js"></script>
+    <script>
+      (() => {
+        const $ = (id) => document.getElementById(id);
+        const dashboardTab = $("dashboard-tab");
+        const dashboardPanel = $("dashboard-mode");
+        const setMode = (mode) => {
+          document
+            .querySelectorAll(".mode-tab")
+            .forEach((tab) =>
+              tab.classList.toggle("active", tab.dataset.mode === mode),
+            );
+          ["writing-mode", "speaking-mode", "dashboard-mode"].forEach((id) =>
+            $(id)?.classList.toggle("active", id === `${mode}-mode`),
+          );
+          if (mode === "dashboard") loadDashboard();
+        };
+        dashboardTab?.addEventListener("click", () => setMode("dashboard"));
+        window.addEventListener("sbs:dashboard-open", loadDashboard);
+        document
+          .querySelectorAll(".mode-tab[data-mode]:not([data-mode=dashboard])")
+          .forEach((tab) => {
+            tab.addEventListener("click", () =>
+              dashboardPanel?.classList.remove("active"),
+            );
+          });
+        $("refresh-dashboard")?.addEventListener("click", loadDashboard);
+        $("clear-dashboard-history")?.addEventListener("click", async () => {
+          if (
+            !window.confirm(
+              "Delete all saved results for this browser? This cannot be undone.",
+            )
+          )
+            return;
+          try {
+            const response = await fetch("/api/dashboard/history", {
+              method: "DELETE",
+            });
+            if (!response.ok) throw new Error("Could not clear history.");
+            await loadDashboard();
+          } catch (error) {
+            $("dashboard-message").textContent = error.message;
+          }
+        });
+        function safe(value) {
+          return String(value ?? "").replace(
+            /[&<>"']/g,
+            (char) =>
+              ({
+                "&": "&amp;",
+                "<": "&lt;",
+                ">": "&gt;",
+                '"': "&quot;",
+                "'": "&#39;",
+              })[char],
+          );
+        }
+        async function loadDashboard() {
+          const message = $("dashboard-message");
+          const tbody = $("dashboard-history");
+          if (!message || !tbody) return;
+          message.textContent = "Loading saved results...";
+          try {
+            const response = await fetch("/api/dashboard", {
+              cache: "no-store",
+            });
+            if (!response.ok) throw new Error("Could not load dashboard data.");
+            const data = await response.json();
+            $("dashboard-total").textContent = data.total_attempts ?? 0;
+            $("dashboard-writing-average").textContent =
+              data.writing_average ?? "—";
+            $("dashboard-speaking-average").textContent =
+              data.speaking_average ?? "—";
+            $("dashboard-writing-count").textContent =
+              `${data.writing_count ?? 0} attempts`;
+            $("dashboard-speaking-count").textContent =
+              `${data.speaking_count ?? 0} attempts`;
+            const recent = Array.isArray(data.recent) ? data.recent : [];
+            tbody.innerHTML = recent
+              .map((item) => {
+                const date = item.created_at
+                  ? new Date(item.created_at).toLocaleString()
+                  : "—";
+                return `<tr><td><span class="history-type ${safe(item.exam_type)}">${safe(item.exam_type)}</span></td><td>${safe(item.task_label)}</td><td><strong>${Number(item.overall_band).toFixed(1)}</strong></td><td>${safe(date)}</td><td class="history-summary">${safe(item.summary || "No summary")}</td></tr>`;
+              })
+              .join("");
+            message.hidden = recent.length > 0;
+            if (!recent.length)
+              message.textContent =
+                "No saved results yet. Complete a Writing or Speaking assessment to see your progress here.";
+          } catch (error) {
+            message.hidden = false;
+            message.textContent =
+              error.message || "Dashboard could not be loaded.";
+          }
+        }
+        window.addEventListener(
+          "DOMContentLoaded",
+          () => {
+            if (dashboardPanel && !dashboardPanel.classList.contains("active"))
+              dashboardPanel.classList.remove("active");
+          },
+          { once: true },
+        );
+      })();
+    </script>
   </body>
 </html>

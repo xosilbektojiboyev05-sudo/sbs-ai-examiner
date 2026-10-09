@@ -9,24 +9,21 @@ import base64
 import tempfile
 
 import math
+import sqlite3
+import secrets
+from datetime import datetime, timezone
 
 from pathlib import Path
 
 from typing import Any
 
-
-
-from fastapi import FastAPI, HTTPException, UploadFile, File, Response
+from fastapi import FastAPI, HTTPException, UploadFile, File, Response, Request
 
 from fastapi.responses import FileResponse, JSONResponse
 
 from pydantic import BaseModel
 
 from groq import Groq
-
-
-
-
 
 # ============================================================
 
@@ -36,21 +33,13 @@ from groq import Groq
 
 # ============================================================
 
-
-
-
-
 # ============================================================
 
 # FILE CONFIGURATION
 
 # ============================================================
 
-
-
 BASE_DIR = Path(__file__).resolve().parent
-
-
 
 INDEX_FILE = BASE_DIR / "index.html"
 
@@ -59,10 +48,74 @@ STYLE_FILE = BASE_DIR / "style.css"
 SCRIPT_FILE = BASE_DIR / "script.js"
 
 LOGO_FILE = BASE_DIR / "image.png"
+DATABASE_FILE = Path(os.getenv("DATABASE_PATH", str(BASE_DIR / "sbs_results.db")))
 
 
+def initialize_database() -> None:
+    """Create the local database used for anonymous browser histories."""
+    with sqlite3.connect(DATABASE_FILE) as connection:
+        connection.execute(
+            """CREATE TABLE IF NOT EXISTS exam_results (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                client_id TEXT NOT NULL,
+                exam_type TEXT NOT NULL,
+                task_label TEXT NOT NULL,
+                overall_band REAL NOT NULL,
+                summary TEXT NOT NULL DEFAULT '',
+                result_json TEXT NOT NULL,
+                created_at TEXT NOT NULL
+            )"""
+        )
+        connection.execute(
+            "CREATE INDEX IF NOT EXISTS idx_exam_results_client_date "
+            "ON exam_results(client_id, created_at DESC)"
+        )
 
 
+def save_exam_result(
+    client_id: str | None, exam_type: str, task_label: str, result: dict[str, Any]
+) -> None:
+    # Do not mix records between visitors if a browser has no session cookie.
+    if not client_id:
+        return
+    overall = float(result.get("overall_band", 0) or 0)
+    summary = str(result.get("summary", "") or "")[:1000]
+    created_at = datetime.now(timezone.utc).isoformat(timespec="seconds")
+    with sqlite3.connect(DATABASE_FILE) as connection:
+        connection.execute(
+            """INSERT INTO exam_results
+               (client_id, exam_type, task_label, overall_band, summary, result_json, created_at)
+               VALUES (?, ?, ?, ?, ?, ?, ?)""",
+            (client_id, exam_type, task_label, overall, summary,
+             json.dumps(result, ensure_ascii=False), created_at),
+        )
+
+
+def read_dashboard(client_id: str | None) -> dict[str, Any]:
+    if not client_id:
+        return {"total_attempts": 0, "writing_count": 0, "speaking_count": 0,
+                "writing_average": None, "speaking_average": None, "recent": []}
+    with sqlite3.connect(DATABASE_FILE) as connection:
+        connection.row_factory = sqlite3.Row
+        rows = connection.execute(
+            """SELECT id, exam_type, task_label, overall_band, summary, created_at
+               FROM exam_results WHERE client_id = ?
+               ORDER BY created_at DESC, id DESC LIMIT 100""", (client_id,)
+        ).fetchall()
+    recent = [dict(row) for row in rows]
+    writing = [row["overall_band"] for row in recent if row["exam_type"] == "writing"]
+    speaking = [row["overall_band"] for row in recent if row["exam_type"] == "speaking"]
+    return {
+        "total_attempts": len(recent),
+        "writing_count": len(writing),
+        "speaking_count": len(speaking),
+        "writing_average": round(sum(writing) / len(writing), 1) if writing else None,
+        "speaking_average": round(sum(speaking) / len(speaking), 1) if speaking else None,
+        "recent": recent,
+    }
+
+
+initialize_database()
 
 # ============================================================
 
@@ -70,17 +123,11 @@ LOGO_FILE = BASE_DIR / "image.png"
 
 # ============================================================
 
-
-
 WRITING_MODEL = "openai/gpt-oss-120b"
 
 VISION_MODEL = "qwen/qwen3.8-27b"
 
 SPEECH_MODEL = "whisper-large-v3"
-
-
-
-
 
 # ============================================================
 
@@ -88,21 +135,15 @@ SPEECH_MODEL = "whisper-large-v3"
 
 # ============================================================
 
-
-
 app = FastAPI(
 
     title="SBS AI Examiner",
 
     description="AI-powered IELTS Writing and Speaking Examiner",
 
-    version="4.0.0",
+    version="4.1.0",
 
 )
-
-
-
-
 
 # ============================================================
 
@@ -110,11 +151,7 @@ app = FastAPI(
 
 # ============================================================
 
-
-
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
-
-
 
 if not GROQ_API_KEY:
 
@@ -123,8 +160,6 @@ if not GROQ_API_KEY:
         "WARNING: GROQ_API_KEY environment variable is not set."
 
     )
-
-
 
 client = (
 
@@ -135,10 +170,6 @@ client = (
     else None
 
 )
-
-
-
-
 
 def require_client() -> Groq:
 
@@ -152,13 +183,7 @@ def require_client() -> Groq:
 
         )
 
-
-
     return client
-
-
-
-
 
 # ============================================================
 
@@ -166,15 +191,9 @@ def require_client() -> Groq:
 
 # ============================================================
 
-
-
 def clean_json_text(text: str) -> str:
 
-
-
     text = (text or "").strip()
-
-
 
     if text.startswith("```"):
 
@@ -188,8 +207,6 @@ def clean_json_text(text: str) -> str:
 
         )
 
-
-
         text = re.sub(
 
             r"\s*```$",
@@ -200,13 +217,7 @@ def clean_json_text(text: str) -> str:
 
         )
 
-
-
     return text.strip()
-
-
-
-
 
 def parse_ai_json(
 
@@ -214,25 +225,17 @@ def parse_ai_json(
 
 ) -> dict[str, Any]:
 
-
-
     cleaned = clean_json_text(text)
-
-
 
     try:
 
         return json.loads(cleaned)
 
-
-
     except json.JSONDecodeError:
-
-
 
         match = re.search(
 
-            r"\\{.*\\}",
+            r"\\\{.*\\\}",
 
             cleaned,
 
@@ -240,11 +243,7 @@ def parse_ai_json(
 
         )
 
-
-
         if match:
-
-
 
             try:
 
@@ -254,13 +253,9 @@ def parse_ai_json(
 
                 )
 
-
-
             except json.JSONDecodeError:
 
                 pass
-
-
 
         raise HTTPException(
 
@@ -270,27 +265,17 @@ def parse_ai_json(
 
         )
 
-
-
-
-
 # ============================================================
 
 # IELTS BAND HELPERS
 
 # ============================================================
 
-
-
 def clamp_band(value: Any) -> float:
-
-
 
     try:
 
         number = float(value)
-
-
 
     except (
 
@@ -302,8 +287,6 @@ def clamp_band(value: Any) -> float:
 
         number = 0.0
 
-
-
     number = max(
 
         0.0,
@@ -312,17 +295,11 @@ def clamp_band(value: Any) -> float:
 
     )
 
-
-
     return math.floor(
 
         number * 2 + 0.5
 
     ) / 2
-
-
-
-
 
 def calculate_ielts_overall(
 
@@ -330,17 +307,11 @@ def calculate_ielts_overall(
 
 ) -> float:
 
-
-
     if not values:
 
         return 0.0
 
-
-
     average = sum(values) / len(values)
-
-
 
     return math.floor(
 
@@ -348,17 +319,11 @@ def calculate_ielts_overall(
 
     ) / 2
 
-
-
-
-
 def word_count(
 
     text: str
 
 ) -> int:
-
-
 
     return len(
 
@@ -372,35 +337,21 @@ def word_count(
 
     )
 
-
-
-
-
 def normalize_list(
 
     value: Any
 
 ) -> list:
 
-
-
     if isinstance(value, list):
 
         return value
-
-
 
     if value is None:
 
         return []
 
-
-
     return [str(value)]
-
-
-
-
 
 # ============================================================
 
@@ -408,11 +359,7 @@ def normalize_list(
 
 # ============================================================
 
-
-
 class WritingRequest(BaseModel):
-
-
 
     task: str = "1"
 
@@ -422,13 +369,7 @@ class WritingRequest(BaseModel):
 
     language: str = "en"
 
-
-
-
-
 class SpeakingAnswer(BaseModel):
-
-
 
     question: str
 
@@ -436,19 +377,9 @@ class SpeakingAnswer(BaseModel):
 
     part: int
 
-
-
-
-
 class SpeakingEvaluationRequest(BaseModel):
 
-
-
     answers: list[SpeakingAnswer]
-
-
-
-
 
 # ============================================================
 
@@ -456,17 +387,11 @@ class SpeakingEvaluationRequest(BaseModel):
 
 # ============================================================
 
-
-
 @app.get("/")
 
-async def home():
-
-
+async def home(http_request: Request):
 
     if not INDEX_FILE.exists():
-
-
 
         raise HTTPException(
 
@@ -476,40 +401,32 @@ async def home():
 
         )
 
-
-
-    return FileResponse(
-
-        INDEX_FILE
-
-    )
-
-
-
-
+    response = FileResponse(INDEX_FILE)
+    if not http_request.cookies.get("sbs_session"):
+        response.set_cookie(
+            key="sbs_session", value=secrets.token_urlsafe(24),
+            httponly=True, samesite="lax", secure=http_request.url.scheme == "https",
+            max_age=60 * 60 * 24 * 365, path="/"
+        )
+    return response
 
 # ============================================================
 
 @app.head("/")
-async def home_head():
-    return Response(status_code=200)
 
+async def home_head():
+
+    return Response(status_code=200)
 
 # CSS
 
 # ============================================================
 
-
-
 @app.get("/style.css")
 
 async def stylesheet():
 
-
-
     if not STYLE_FILE.exists():
-
-
 
         raise HTTPException(
 
@@ -519,8 +436,6 @@ async def stylesheet():
 
         )
 
-
-
     return FileResponse(
 
         STYLE_FILE,
@@ -529,27 +444,17 @@ async def stylesheet():
 
     )
 
-
-
-
-
 # ============================================================
 
 # JAVASCRIPT
 
 # ============================================================
 
-
-
 @app.get("/script.js")
 
 async def javascript():
 
-
-
     if not SCRIPT_FILE.exists():
-
-
 
         raise HTTPException(
 
@@ -559,8 +464,6 @@ async def javascript():
 
         )
 
-
-
     return FileResponse(
 
         SCRIPT_FILE,
@@ -569,27 +472,17 @@ async def javascript():
 
     )
 
-
-
-
-
 # ============================================================
 
 # SBS LOGO
 
 # ============================================================
 
-
-
 @app.get("/image.png")
 
 async def logo():
 
-
-
     if not LOGO_FILE.exists():
-
-
 
         raise HTTPException(
 
@@ -599,8 +492,6 @@ async def logo():
 
         )
 
-
-
     return FileResponse(
 
         LOGO_FILE,
@@ -609,23 +500,15 @@ async def logo():
 
     )
 
-
-
-
-
 # ============================================================
 
 # HEALTH CHECK
 
 # ============================================================
 
-
-
 @app.get("/api/health")
 
 async def health():
-
-
 
     return {
 
@@ -651,17 +534,25 @@ async def health():
 
     }
 
-
-
-
-
 # ============================================================
+
+@app.get("/api/dashboard")
+async def dashboard(http_request: Request):
+    return read_dashboard(http_request.cookies.get("sbs_session"))
+
+
+@app.delete("/api/dashboard/history")
+async def clear_dashboard_history(http_request: Request):
+    client_id = http_request.cookies.get("sbs_session")
+    if client_id:
+        with sqlite3.connect(DATABASE_FILE) as connection:
+            connection.execute("DELETE FROM exam_results WHERE client_id = ?", (client_id,))
+    return {"status": "ok", "message": "History cleared."}
+
 
 # IMAGE → DATA URL
 
 # ============================================================
-
-
 
 def image_to_data_url(
 
@@ -671,15 +562,11 @@ def image_to_data_url(
 
 ) -> str:
 
-
-
     encoded = base64.b64encode(
 
         image_bytes
 
     ).decode("utf-8")
-
-
 
     return (
 
@@ -687,17 +574,11 @@ def image_to_data_url(
 
     )
 
-
-
-
-
 # ============================================================
 
 # VISION
 
 # ============================================================
-
-
 
 async def analyze_image(
 
@@ -707,19 +588,11 @@ async def analyze_image(
 
 ) -> str:
 
-
-
     groq = require_client()
-
-
 
     image_bytes = await image.read()
 
-
-
     if not image_bytes:
-
-
 
         raise HTTPException(
 
@@ -729,8 +602,6 @@ async def analyze_image(
 
         )
 
-
-
     content_type = (
 
         image.content_type
@@ -739,15 +610,11 @@ async def analyze_image(
 
     )
 
-
-
     if not content_type.startswith(
 
         "image/"
 
     ):
-
-
 
         raise HTTPException(
 
@@ -757,15 +624,11 @@ async def analyze_image(
 
         )
 
-
-
     if len(image_bytes) > (
 
         20 * 1024 * 1024
 
     ):
-
-
 
         raise HTTPException(
 
@@ -775,8 +638,6 @@ async def analyze_image(
 
         )
 
-
-
     data_url = image_to_data_url(
 
         image_bytes,
@@ -784,8 +645,6 @@ async def analyze_image(
         content_type
 
     )
-
-
 
     response = (
 
@@ -835,8 +694,6 @@ async def analyze_image(
 
     )
 
-
-
     return (
 
         response
@@ -851,31 +708,22 @@ async def analyze_image(
 
     )
 
-
-
-
-
 # ============================================================
 
 # WRITING EVALUATION
 
 # ============================================================
 
-
-
 @app.post("/api/assess-writing")
 
 async def assess_writing(
 
-    request: WritingRequest
+    request: WritingRequest,
+    http_request: Request,
 
 ):
 
-
-
     groq = require_client()
-
-
 
     task = request.task.strip()
 
@@ -883,11 +731,7 @@ async def assess_writing(
 
     essay = request.essay.strip()
 
-
-
     if not essay:
-
-
 
         raise HTTPException(
 
@@ -897,11 +741,7 @@ async def assess_writing(
 
         )
 
-
-
     if not question:
-
-
 
         raise HTTPException(
 
@@ -911,23 +751,15 @@ async def assess_writing(
 
         )
 
-
-
     count = word_count(essay)
 
-
-
     if task == "1":
-
-
 
         task_description = (
 
             "IELTS Academic Writing Task 1"
 
         )
-
-
 
         minimum_words = 150
 
@@ -937,19 +769,13 @@ async def assess_writing(
 
         )
 
-
-
     else:
-
-
 
         task_description = (
 
             "IELTS Academic Writing Task 2"
 
         )
-
-
 
         minimum_words = 250
 
@@ -959,131 +785,77 @@ async def assess_writing(
 
         )
 
-
-
-
-
     prompt = f"""
 
 You are a highly experienced IELTS Academic Writing examiner.
-
-
 
 Assess the student's actual writing using IELTS-style band
 
 descriptors.
 
-
-
 TASK:
 
 {task_description}
-
-
 
 MINIMUM WORD COUNT:
 
 {minimum_words}
 
-
-
 CURRENT WORD COUNT:
 
 {count}
 
-
-
-
-
 IMPORTANT SCORING PRINCIPLES:
 
-
-
 1\. Be strict, but do NOT artificially lower the score.
-
-
 
 2\. Do not give Band 7 or lower merely because the answer contains
 
 one or two minor mistakes.
 
-
-
 3\. Evaluate the complete performance, not isolated mistakes.
-
-
 
 4\. A strong Band 7, 7.5 or 8 response can contain occasional
 
 grammar, vocabulary, punctuation or wording errors.
 
-
-
 5\. Do not punish the student twice for the same mistake.
-
-
 
 6\. A data-selection mistake in Task 1 should primarily affect
 
 Task Achievement.
 
-
-
 7\. Do not automatically lower Grammar or Lexical Resource because
 
 of a data-selection mistake.
 
-
-
 8\. A vocabulary mistake should primarily affect Lexical Resource.
-
-
 
 9\. A grammar mistake should primarily affect Grammatical Range
 
 and Accuracy.
 
-
-
 10\. Coherence should be judged from the complete organization
 
 and logical progression.
 
-
-
 11\. Do not require every sentence to contain advanced vocabulary.
-
-
 
 12\. Natural and precise vocabulary is better than unnecessary
 
 complex vocabulary.
 
-
-
 13\. Do not invent statistics or information.
 
-
-
 14\. A minor wording problem does not automatically mean Band 6.
-
-
 
 15\. Give Band 8 only when the performance genuinely demonstrates
 
 strong control.
 
-
-
 16\. Use only .0 and .5 scores.
 
-
-
-
-
 BAND CALIBRATION:
-
-
 
 Band 5:
 
@@ -1094,8 +866,6 @@ Band 5:
 \- inadequate development
 
 \- vocabulary and grammar often restrict communication
-
-
 
 Band 6:
 
@@ -1111,8 +881,6 @@ Band 6:
 
 \- communication remains generally clear
 
-
-
 Band 7:
 
 \- clear progression
@@ -1126,8 +894,6 @@ Band 7:
 \- some errors remain
 
 \- errors do not seriously reduce clarity
-
-
 
 Band 7.5:
 
@@ -1143,8 +909,6 @@ Band 7.5:
 
 \- strong organization
 
-
-
 Band 8:
 
 \- very good control
@@ -1157,17 +921,9 @@ Band 8:
 
 \- precise and well-developed response
 
-
-
-
-
 TASK 1:
 
-
-
 Assess:
-
-
 
 \- overview
 
@@ -1181,21 +937,13 @@ Assess:
 
 \- trends
 
-
-
 A small numerical imprecision should not automatically destroy
 
 the entire Task Achievement score.
 
-
-
 TASK 2:
 
-
-
 Assess:
-
-
 
 \- position
 
@@ -1213,13 +961,7 @@ Assess:
 
 \- grammar
 
-
-
-
-
 CRITERIA:
-
-
 
 1\. {first_criterion}
 
@@ -1229,35 +971,17 @@ CRITERIA:
 
 4\. Grammatical Range and Accuracy
 
-
-
-
-
 SCORING METHOD:
-
-
 
 First decide each criterion separately.
 
-
-
 Then explain the evidence.
-
-
 
 Then calculate the overall score.
 
-
-
 Do not lower all four criteria because of one weakness.
 
-
-
-
-
 RETURN ONLY VALID JSON:
-
-
 
 {{
 
@@ -1289,31 +1013,15 @@ RETURN ONLY VALID JSON:
 
 }}
 
-
-
-
-
 QUESTION:
-
-
 
 {question}
 
-
-
-
-
 STUDENT ANSWER:
-
-
 
 {essay}
 
 """
-
-
-
-
 
     response = (
 
@@ -1363,10 +1071,6 @@ STUDENT ANSWER:
 
     )
 
-
-
-
-
     result = parse_ai_json(
 
         response
@@ -1381,17 +1085,11 @@ STUDENT ANSWER:
 
     )
 
-
-
-
-
     task_score = clamp_band(
 
         result.get("task_score")
 
     )
-
-
 
     coherence_score = clamp_band(
 
@@ -1399,25 +1097,17 @@ STUDENT ANSWER:
 
     )
 
-
-
     lexical_score = clamp_band(
 
         result.get("lexical_score")
 
     )
 
-
-
     grammar_score = clamp_band(
 
         result.get("grammar_score")
 
     )
-
-
-
-
 
     overall = calculate_ielts_overall([
 
@@ -1431,10 +1121,6 @@ STUDENT ANSWER:
 
     ])
 
-
-
-
-
     result["task_score"] = task_score
 
     result["coherence_score"] = coherence_score
@@ -1447,17 +1133,11 @@ STUDENT ANSWER:
 
     result["word_count"] = count
 
-
-
-
-
     result["strengths"] = normalize_list(
 
         result.get("strengths")
 
     )
-
-
 
     result["weaknesses"] = normalize_list(
 
@@ -1465,15 +1145,11 @@ STUDENT ANSWER:
 
     )
 
-
-
     result["grammar_corrections"] = normalize_list(
 
         result.get("grammar_corrections")
 
     )
-
-
 
     result["vocabulary_suggestions"] = normalize_list(
 
@@ -1481,13 +1157,7 @@ STUDENT ANSWER:
 
     )
 
-
-
-
-
     if count < minimum_words:
-
-
 
         result["word_count_warning"] = (
 
@@ -1499,31 +1169,23 @@ STUDENT ANSWER:
 
         )
 
-
-
     else:
-
-
 
         result["word_count_warning"] = ""
 
-
-
-
-
+    save_exam_result(
+        http_request.cookies.get("sbs_session"),
+        "writing",
+        f"Writing Task {task}",
+        result,
+    )
     return result
-
-
-
-
 
 # ============================================================
 
 # IMAGE / HANDWRITING READER
 
 # ============================================================
-
-
 
 @app.post("/api/read-writing-image")
 
@@ -1533,23 +1195,15 @@ async def read_writing_image(
 
 ):
 
-
-
     instruction = """
 
 You are an IELTS writing image/OCR assistant.
-
-
 
 Read the IELTS writing question and/or handwritten student answer
 
 visible in the image.
 
-
-
 If there is a handwritten answer:
-
-
 
 \- transcribe it accurately
 
@@ -1561,11 +1215,7 @@ If there is a handwritten answer:
 
 \- do not rewrite sentences
 
-
-
 If there is a graph, chart, table, process or diagram:
-
-
 
 \- read the IELTS question accurately
 
@@ -1573,11 +1223,7 @@ If there is a graph, chart, table, process or diagram:
 
 \- do not invent data
 
-
-
 Return ONLY valid JSON:
-
-
 
 {
 
@@ -1591,8 +1237,6 @@ Return ONLY valid JSON:
 
 """
 
-
-
     text = await analyze_image(
 
         image,
@@ -1601,21 +1245,13 @@ Return ONLY valid JSON:
 
     )
 
-
-
     return parse_ai_json(text)
-
-
-
-
 
 # ============================================================
 
 # SPEAKING TRANSCRIPTION
 
 # ============================================================
-
-
 
 @app.post("/api/speaking/transcribe")
 
@@ -1625,19 +1261,11 @@ async def transcribe_speaking_audio(
 
 ):
 
-
-
     groq = require_client()
-
-
 
     audio_bytes = await audio.read()
 
-
-
     if not audio_bytes:
-
-
 
         raise HTTPException(
 
@@ -1647,8 +1275,6 @@ async def transcribe_speaking_audio(
 
         )
 
-
-
     suffix = Path(
 
         audio.filename
@@ -1657,21 +1283,13 @@ async def transcribe_speaking_audio(
 
     ).suffix
 
-
-
     if not suffix:
 
         suffix = ".webm"
 
-
-
     temp_path = None
 
-
-
     try:
-
-
 
         with tempfile.NamedTemporaryFile(
 
@@ -1681,21 +1299,13 @@ async def transcribe_speaking_audio(
 
         ) as temp_file:
 
-
-
             temp_file.write(
 
                 audio_bytes
 
             )
 
-
-
             temp_path = temp_file.name
-
-
-
-
 
         with open(
 
@@ -1705,27 +1315,45 @@ async def transcribe_speaking_audio(
 
         ) as audio_file:
 
+           transcription = (
 
+    groq.audio.transcriptions.create(
 
-            transcription = (
+        file=audio_file,
 
-                groq.audio.transcriptions.create(
+        model=SPEECH_MODEL,
 
-                    file=audio_file,
+        language="en",
 
-                    model=SPEECH_MODEL,
+        prompt=(
 
-                    response_format="verbose_json",
+            "This is an IELTS Speaking test. "
 
-                    temperature=0
+            "The speaker is speaking English. "
 
-                )
+            "Transcribe the spoken English exactly as spoken. "
 
-            )
+            "Do not translate it. "
 
+            "Do not output Arabic, Persian, or another script."
 
+        ),
 
+        response_format="verbose_json",
 
+        temperature=0,
+
+        timestamp_granularities=[
+
+            "word",
+
+            "segment"
+
+        ]
+
+    )
+
+)
 
         text = getattr(
 
@@ -1737,23 +1365,13 @@ async def transcribe_speaking_audio(
 
         ) or ""
 
-
-
-
-
         return {
 
             "text": text.strip()
 
         }
 
-
-
-
-
     except Exception as exc:
-
-
 
         raise HTTPException(
 
@@ -1769,31 +1387,17 @@ async def transcribe_speaking_audio(
 
         )
 
-
-
-
-
     finally:
 
-
-
         if temp_path:
-
-
 
             try:
 
                 os.remove(temp_path)
 
-
-
             except OSError:
 
                 pass
-
-
-
-
 
 # ============================================================
 
@@ -1801,35 +1405,24 @@ async def transcribe_speaking_audio(
 
 # ============================================================
 
-
-
 @app.post("/api/speaking/evaluate")
 
 async def evaluate_speaking(
 
-    request: SpeakingEvaluationRequest
+    request: SpeakingEvaluationRequest,
+    http_request: Request,
 
 ):
 
-
-
     groq = require_client()
 
-
-
     answers = request.answers
-
-
-
-
 
     # --------------------------------------------------------
 
     # REQUIRE 5 PART 1 ANSWERS
 
     # --------------------------------------------------------
-
-
 
     part1_answers = [
 
@@ -1847,13 +1440,7 @@ async def evaluate_speaking(
 
     ]
 
-
-
-
-
     if len(part1_answers) < 5:
-
-
 
         raise HTTPException(
 
@@ -1873,21 +1460,13 @@ async def evaluate_speaking(
 
         )
 
-
-
-
-
     # --------------------------------------------------------
 
     # BUILD PERFORMANCE
 
     # --------------------------------------------------------
 
-
-
     answer_text = []
-
-
 
     for index, item in enumerate(
 
@@ -1897,27 +1476,19 @@ async def evaluate_speaking(
 
     ):
 
-
-
         answer_text.append(
 
             f"""
 
 ANSWER {index}
 
-
-
 PART:
 
 {item.part}
 
-
-
 QUESTION:
 
 {item.question}
-
-
 
 STUDENT RESPONSE:
 
@@ -1927,19 +1498,11 @@ STUDENT RESPONSE:
 
         )
 
-
-
-
-
     combined_answers = "\n".join(
 
         answer_text
 
     )
-
-
-
-
 
     # --------------------------------------------------------
 
@@ -1947,47 +1510,29 @@ STUDENT RESPONSE:
 
     # --------------------------------------------------------
 
-
-
     prompt = f"""
 
 You are a highly experienced IELTS Speaking examiner.
 
-
-
 Evaluate the student's actual IELTS Speaking performance.
 
-
-
 The student has completed five Part 1 questions.
-
-
 
 You must be strict about evidence, but fair about the actual
 
 IELTS performance.
 
-
-
 Do NOT artificially lower scores.
-
-
 
 Do NOT give Band 4 unless the responses genuinely demonstrate
 
 Band 4 characteristics.
-
-
-
-
 
 # ============================================================
 
 CRITERIA
 
 # ============================================================
-
-
 
 1\. Fluency and Coherence
 
@@ -1997,21 +1542,13 @@ CRITERIA
 
 4\. Pronunciation
 
-
-
-
-
 # ============================================================
 
 BAND 4
 
 # ============================================================
 
-
-
 Use Band 4 only when there are clear characteristics such as:
-
-
 
 \- frequent hesitation
 
@@ -2027,13 +1564,7 @@ Use Band 4 only when there are clear characteristics such as:
 
 \- ideas are difficult to develop
 
-
-
 Mistakes alone do NOT justify Band 4.
-
-
-
-
 
 # ============================================================
 
@@ -2041,11 +1572,7 @@ BAND 5
 
 # ============================================================
 
-
-
 Typical characteristics:
-
-
 
 \- can answer familiar questions
 
@@ -2059,21 +1586,13 @@ Typical characteristics:
 
 \- communication is possible but not consistently smooth
 
-
-
-
-
 # ============================================================
 
 BAND 6
 
 # ============================================================
 
-
-
 Typical characteristics:
-
-
 
 \- generally clear communication
 
@@ -2091,21 +1610,13 @@ Typical characteristics:
 
 \- some hesitation may occur
 
-
-
-
-
 # ============================================================
 
 BAND 6.5
 
 # ============================================================
 
-
-
 Typical characteristics:
-
-
 
 \- stronger than typical Band 6
 
@@ -2123,21 +1634,13 @@ Typical characteristics:
 
 \- natural discussion of familiar topics
 
-
-
-
-
 # ============================================================
 
 BAND 7
 
 # ============================================================
 
-
-
 Typical characteristics:
-
-
 
 \- speaks at length without noticeable effort
 
@@ -2155,21 +1658,13 @@ Typical characteristics:
 
 \- pronunciation generally easy to understand
 
-
-
-
-
 # ============================================================
 
 BAND 8
 
 # ============================================================
 
-
-
 Typical characteristics:
-
-
 
 \- fluent and effortless
 
@@ -2185,25 +1680,15 @@ Typical characteristics:
 
 \- ideas developed naturally
 
-
-
-
-
 # ============================================================
 
 PART 1
 
 # ============================================================
 
-
-
 Part 1 answers are naturally shorter than Part 3 answers.
 
-
-
 Do NOT penalize a student merely because a Part 1 answer is short.
-
-
 
 A natural answer of approximately 15–30 seconds can be completely
 
@@ -2211,21 +1696,11 @@ appropriate if it directly answers the question and develops it
 
 sufficiently.
 
-
-
 Do not require academic vocabulary.
-
-
 
 Do not require complex arguments.
 
-
-
 Do not give Band 4 simply because an answer is simple.
-
-
-
-
 
 # ============================================================
 
@@ -2233,11 +1708,7 @@ FLUENCY
 
 # ============================================================
 
-
-
 Consider:
-
-
 
 \- ability to keep speaking
 
@@ -2255,17 +1726,9 @@ Consider:
 
 \- relevance
 
-
-
 The transcript cannot perfectly measure real-time fluency.
 
-
-
 Do not invent hesitation or pauses that are not supported.
-
-
-
-
 
 # ============================================================
 
@@ -2273,11 +1736,7 @@ LEXICAL RESOURCE
 
 # ============================================================
 
-
-
 Consider:
-
-
 
 \- range
 
@@ -2291,13 +1750,7 @@ Consider:
 
 \- natural collocations
 
-
-
 Simple accurate vocabulary is NOT automatically Band 4 or 5.
-
-
-
-
 
 # ============================================================
 
@@ -2305,11 +1758,7 @@ GRAMMAR
 
 # ============================================================
 
-
-
 Consider:
-
-
 
 \- sentence variety
 
@@ -2327,17 +1776,9 @@ Consider:
 
 \- accuracy
 
-
-
 One or two grammar mistakes do NOT justify Band 4.
 
-
-
 Judge the overall pattern.
-
-
-
-
 
 # ============================================================
 
@@ -2345,15 +1786,9 @@ PRONUNCIATION
 
 # ============================================================
 
-
-
 The system currently provides a transcription.
 
-
-
 A transcript cannot perfectly measure:
-
-
 
 \- individual sounds
 
@@ -2365,25 +1800,13 @@ A transcript cannot perfectly measure:
 
 \- connected speech
 
-
-
 Therefore pronunciation is an:
-
-
 
 "AI practice estimate"
 
-
-
 and NOT an official IELTS pronunciation score.
 
-
-
 Do not invent pronunciation problems that cannot be supported.
-
-
-
-
 
 # ============================================================
 
@@ -2391,37 +1814,19 @@ ANTI-UNDER-SCORING RULE
 
 # ============================================================
 
-
-
 Do NOT use:
-
-
 
 "mistake = Band 4"
 
-
-
 Do NOT use:
-
-
 
 "not perfect = Band 5"
 
-
-
 Instead ask:
-
-
 
 "What band best describes the student's overall performance?"
 
-
-
-
-
 A student can receive:
-
-
 
 Fluency = 6.5
 
@@ -2431,25 +1836,15 @@ Grammar = 6.0
 
 Pronunciation = 6.0
 
-
-
 even when mistakes exist.
 
-
-
 This is a realistic result.
-
-
-
-
 
 # ============================================================
 
 RETURN JSON ONLY
 
 # ============================================================
-
-
 
 {{
 
@@ -2481,25 +1876,15 @@ RETURN JSON ONLY
 
 }}
 
-
-
-
-
 # ============================================================
 
 STUDENT PERFORMANCE
 
 # ============================================================
 
-
-
 {combined_answers}
 
 """
-
-
-
-
 
     response = (
 
@@ -2547,10 +1932,6 @@ STUDENT PERFORMANCE
 
     )
 
-
-
-
-
     result = parse_ai_json(
 
         response
@@ -2565,10 +1946,6 @@ STUDENT PERFORMANCE
 
     )
 
-
-
-
-
     fluency = clamp_band(
 
         result.get(
@@ -2578,8 +1955,6 @@ STUDENT PERFORMANCE
         )
 
     )
-
-
 
     lexical = clamp_band(
 
@@ -2591,8 +1966,6 @@ STUDENT PERFORMANCE
 
     )
 
-
-
     grammar = clamp_band(
 
         result.get(
@@ -2603,8 +1976,6 @@ STUDENT PERFORMANCE
 
     )
 
-
-
     pronunciation = clamp_band(
 
         result.get(
@@ -2614,10 +1985,6 @@ STUDENT PERFORMANCE
         )
 
     )
-
-
-
-
 
     overall = calculate_ielts_overall([
 
@@ -2631,17 +1998,11 @@ STUDENT PERFORMANCE
 
     ])
 
-
-
-
-
     result[
 
         "fluency_coherence"
 
     ] = fluency
-
-
 
     result[
 
@@ -2649,15 +2010,11 @@ STUDENT PERFORMANCE
 
     ] = lexical
 
-
-
     result[
 
         "grammatical_range_accuracy"
 
     ] = grammar
-
-
 
     result[
 
@@ -2665,15 +2022,11 @@ STUDENT PERFORMANCE
 
     ] = pronunciation
 
-
-
     result[
 
         "overall_band"
 
     ] = overall
-
-
 
     result[
 
@@ -2681,17 +2034,11 @@ STUDENT PERFORMANCE
 
     ] = len(part1_answers)
 
-
-
-
-
     result["strengths"] = normalize_list(
 
         result.get("strengths")
 
     )
-
-
 
     result["weaknesses"] = normalize_list(
 
@@ -2699,15 +2046,11 @@ STUDENT PERFORMANCE
 
     )
 
-
-
     result["grammar_corrections"] = normalize_list(
 
         result.get("grammar_corrections")
 
     )
-
-
 
     result["vocabulary_suggestions"] = normalize_list(
 
@@ -2715,15 +2058,11 @@ STUDENT PERFORMANCE
 
     )
 
-
-
     result["fluency_advice"] = normalize_list(
 
         result.get("fluency_advice")
 
     )
-
-
 
     result["pronunciation_advice"] = normalize_list(
 
@@ -2731,31 +2070,25 @@ STUDENT PERFORMANCE
 
     )
 
-
-
     result["next_steps"] = normalize_list(
 
         result.get("next_steps")
 
     )
 
-
-
-
-
+    save_exam_result(
+        http_request.cookies.get("sbs_session"),
+        "speaking",
+        "Speaking Test",
+        result,
+    )
     return result
-
-
-
-
 
 # ============================================================
 
 # ERROR HANDLER
 
 # ============================================================
-
-
 
 @app.exception_handler(Exception)
 
@@ -2767,8 +2100,6 @@ async def global_exception_handler(
 
 ):
 
-
-
     if isinstance(
 
         exc,
@@ -2776,8 +2107,6 @@ async def global_exception_handler(
         HTTPException
 
     ):
-
-
 
         return JSONResponse(
 
@@ -2791,10 +2120,6 @@ async def global_exception_handler(
 
         )
 
-
-
-
-
     print(
 
         "SERVER ERROR:",
@@ -2802,10 +2127,6 @@ async def global_exception_handler(
         repr(exc)
 
     )
-
-
-
-
 
     return JSONResponse(
 
@@ -2819,88 +2140,30 @@ async def global_exception_handler(
 
     )
 
-
-
-
-
 # ============================================================
 
 # SERVER
 
 # ============================================================
 
-
-
 if __name__ == "__main__":
-
-
-
     import uvicorn
 
-
-
-    # Hosting platforms usually provide PORT.
-
-    # Local computer uses 8000.
-
-    host = os.getenv(
-
-        "HOST",
-
-        "0.0.0.0"
-
-    )
-
-
-
-    port = int(
-
-        os.getenv(
-
-            "PORT",
-
-            "8000"
-
-        )
-
-    )
-
-
+    host = os.getenv("HOST", "0.0.0.0")
+    port = int(os.getenv("PORT", "8000"))
 
     print()
-
     print("=" * 60)
-
     print("SBS AI EXAMINER")
-
     print("=" * 60)
-
-    print(
-
-        f"Server: http://127.0.0.1:{port}"
-
-    )
-
-    print(
-
-        "Hosting mode: enabled"
-
-    )
-
+    print(f"Server: http://127.0.0.1:{port}")
+    print("Hosting mode: enabled")
     print("=" * 60)
-
     print()
-
-
 
     uvicorn.run(
-
         "app:app",
-
         host=host,
-
         port=port,
-
-        reload=True
-
+        reload=True,
     )
